@@ -19,9 +19,9 @@ router.route("/logOut").post(verifyJWT, logOutUser);
 //change user password route
 router.route("/update-user-password").post(verifyJWT, updateUserPassword);
 
-router.route("/checkMic").get(verifyJWT, (req, res)=>(
-    res.json("Hello ")
-))
+// router.route("/checkMic").get(verifyJWT, (req, res)=>(
+//     res.json("Hello ")
+// ))
 
 export {router};
 
