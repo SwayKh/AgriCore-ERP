@@ -2,10 +2,7 @@ import mongoose from "mongoose";
 
 
 const stockSchema = new mongoose.Schema({
-    location:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"location"
-    },
+    
     item:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"item"
@@ -15,11 +12,11 @@ const stockSchema = new mongoose.Schema({
         ref:"user"
     },
     quantity:{
-        type:Nubmer,
+        type:Number,
         required:true,
         default:0,
     },
 
 },{timestamps:true})
 
-export const Stock = mongoose.model("stock", stockSchema);
+export const Stock = mongoose.model("Stock", stockSchema);

@@ -6,7 +6,8 @@ import { User } from "../models/User.model.js";
 const verifyJWT = asyncHandler(async(req, res, next)=>{
     //fetch the token from cookies or header object
     const accessToken = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer", "");
-
+ 
+    
     //throw error if no token is availabe
     //user is not authenticated
     if (!accessToken) {
@@ -20,7 +21,7 @@ const verifyJWT = asyncHandler(async(req, res, next)=>{
     }
 
     //verify the access token fetched from above
-    const decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, options, (Error)=>{throw new ApiError(500, "Invalid AT")}) 
+    const decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, options) 
     
     if (!decodedToken) {
         throw new ApiError(403, "Invalid User Token", false);
