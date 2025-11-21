@@ -10,7 +10,7 @@ const router = Router();
 router.route("/register").post(registerUser);
 
 //routes to the login request to the login function
-router.route("/login").post(loginUser);
+router.route("/login").post(verifyJWT, loginUser);
 
 //protected routes
 //logout route for user
@@ -22,6 +22,8 @@ router.route("/update-user-password").post(verifyJWT, updateUserPassword);
 // router.route("/checkMic").get(verifyJWT, (req, res)=>(
 //     res.json("Hello ")
 // ))
+
+
 
 export {router};
 

@@ -11,10 +11,10 @@ const generateAccessNrefreshToken = async (userId) => {
   try {
     const user = await User.findById(userId);
 
-    //gerating the token using the methdods defined in the userSchema
+    //gerating the token using the methods defined in the userSchema
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
-
+    
     //updating the user refresh token field locally
     user.refreshToken = refreshToken;
     //reflecting the locally update to the database
@@ -25,7 +25,7 @@ const generateAccessNrefreshToken = async (userId) => {
   } catch (error) {
     throw new ApiError(
       500,
-      "Something went wrong while aunthenticating user. ",
+      error.message,
       false
     );
   }
