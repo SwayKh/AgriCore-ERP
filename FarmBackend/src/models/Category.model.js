@@ -2,11 +2,20 @@ import mongoose from "mongoose";
 
 
 const categorySchema = new mongoose.Schema({
-    categoryType:{
+    categoryName:{
         type:String,
         required:true,
         unique:true,
+    },
+    unit:{
+        type: String,
+        required: true,
+    },
+    ownerId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref:"user",
+        required:true,
     }
 },{timestamps:true})
 
-export const category = mongoose.model("category", categorySchema);
+export const Category = mongoose.model("Category", categorySchema);

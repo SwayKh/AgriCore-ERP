@@ -29,12 +29,15 @@ app.use(cookieParser());
 //routes
 //route import
 import {router as userRouter } from "./routes/user.routes.js";
+import {router as itemRouter} from "./routes/item.routes.js"
 
 //user routes
 //all user related request will be routed from here only
 app.use("/api/v1/user", userRouter)
 
-//other routes
 
+
+//other routes
+app.use("/api/v1/item", itemRouter)
 
 export default app;
