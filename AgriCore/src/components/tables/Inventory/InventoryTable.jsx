@@ -20,7 +20,6 @@ export default function InventoryTable() {
         handleSaveItem,
         handleDeleteItem,
         handleAddCategory,
-        categorySpecificFields
     } = useContext(InventoryContext);
 
     const [open, setOpen] = useState(false);
@@ -148,8 +147,6 @@ export default function InventoryTable() {
                 onClose={handleClose}
                 onSave={(itemToSave) => handleSaveItem(itemToSave, editingItem)}
                 item={editingItem}
-                categories={categories}
-                categorySpecificFields={categorySpecificFields}
             />
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
@@ -169,32 +166,21 @@ export default function InventoryTable() {
                                 </TableCell>
                             </TableRow>
                             {groupedInventory[category].map((item) => (
-                                <React.Fragment key={item.id}>
-                                    <TableRow>
-                                        <TableCell component="th" scope="row">
-                                            {item.name}
-                                        </TableCell>
-                                        <TableCell align="right">{item.quantity} {categoryUnits[item.category]}</TableCell>
-                                        <TableCell align="right">{item.price}</TableCell>
-                                        <TableCell align="right">
-                                            <IconButton onClick={() => handleClickOpen(item)} aria-label="edit">
-                                                <EditIcon />
-                                            </IconButton>
-                                            <IconButton onClick={() => handleDeleteItem(item.id)} aria-label="delete">
-                                                <DeleteIcon />
-                                            </IconButton>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow key={`${item.id}-details`}>
-                                        <TableCell colSpan={4}>
-                                            {categorySpecificFields[item.category]?.map(field => (
-                                                <Typography key={field.name} variant="body2" sx={{ pl: 2 }}>
-                                                    <strong>{field.label}:</strong> {item[field.name]}
-                                                </Typography>
-                                            ))}
-                                        </TableCell>
-                                    </TableRow>
-                                </React.Fragment>
+                                <TableRow key={item.id}>
+                                    <TableCell component="th" scope="row">
+                                        {item.name}
+                                    </TableCell>
+                                    <TableCell align="right">{item.quantity} {categoryUnits[item.category]}</TableCell>
+                                    <TableCell align="right">{item.price}</TableCell>
+                                    <TableCell align="right">
+                                        <IconButton onClick={() => handleClickOpen(item)} aria-label="edit">
+                                            <EditIcon />
+                                        </IconButton>
+                                        <IconButton onClick={() => handleDeleteItem(item.id)} aria-label="delete">
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </TableCell>
+                                </TableRow>
                             ))}
                         </React.Fragment>
                     ))}
@@ -203,3 +189,4 @@ export default function InventoryTable() {
         </TableContainer>
     );
 }
+

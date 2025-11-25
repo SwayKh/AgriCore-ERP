@@ -1,11 +1,13 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import {
     Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle,
     Select, MenuItem, FormControl, InputLabel
 } from '@mui/material';
+import { InventoryContext } from '../../../context/InventoryContext';
 
-export default function ItemDialog({ open, onClose, onSave, item, categories, categorySpecificFields }) {
+export default function ItemDialog({ open, onClose, onSave, item }) {
+    const { categories } = useContext(InventoryContext);
     const [newItem, setNewItem] = useState({ name: '', quantity: '', price: '', category: '' });
 
     useEffect(() => {
@@ -71,19 +73,6 @@ export default function ItemDialog({ open, onClose, onSave, item, categories, ca
                         ))}
                     </Select>
                 </FormControl>
-                {newItem.category && categorySpecificFields[newItem.category] && categorySpecificFields[newItem.category].map(field => (
-                    <TextField
-                        key={field.name}
-                        margin="dense"
-                        name={field.name}
-                        label={field.label}
-                        type={field.type}
-                        fullWidth
-                        variant="standard"
-                        value={newItem[field.name] || ''}
-                        onChange={handleNewItemChange}
-                    />
-                ))}
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Cancel</Button>

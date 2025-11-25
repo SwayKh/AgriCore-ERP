@@ -19,6 +19,9 @@ import CropsTable from './components/tables/Crops/CropsTable.jsx';
 import LivestockTable from './components/tables/Livestock/LivestockTable.jsx';
 import FinanceTable from './components/tables/Finance/FinanceTable.jsx';
 
+import { InventoryProvider } from './context/InventoryContext.jsx';
+import { CropsProvider } from './context/CropsContext.jsx';
+
 // Placeholder for a Dashboard component
 const Dashboard = () => <div>Welcome to AgriCore Dashboard!</div>;
 
@@ -59,6 +62,7 @@ const theme=createTheme({
     palette: {
         primary: {
             main: green[500],
+            contrastText: '#FFFFFF', // Set primary button text to white
         },
         secondary: {
             main: amber[500],
@@ -70,7 +74,11 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
      <ThemeProvider theme={theme}>
         <CssBaseline/>
-        <RouterProvider router={router}/>
+        <InventoryProvider>
+          <CropsProvider>
+            <RouterProvider router={router}/>
+          </CropsProvider>
+        </InventoryProvider>
      </ThemeProvider>
   </StrictMode>,
 );

@@ -75,7 +75,7 @@ export default function SignUp(props) {
         const form = event.currentTarget;
         const email = form.email.value;
         const password = form.password.value;
-        const name = form.name.value;
+        const username = form.name.value;
 
         // Reset all error states
         setEmailError(false);
@@ -102,16 +102,16 @@ export default function SignUp(props) {
         }
 
         // Validate name
-        if (!name || name.length < 1) {
+        if (!username || username.length < 1) {
             setNameError(true);
             setNameErrorMessage('Name is required.');
             isValid = false;
         }
 
         if (isValid) {
-            const data = { name, email, password };
+            const data = { username, email, password };
 
-            fetch('http://localhost/api/v1/user/login', { 
+            fetch('http://localhost:8000/api/v1/user/register', { 
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

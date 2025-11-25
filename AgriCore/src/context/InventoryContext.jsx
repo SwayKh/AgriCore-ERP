@@ -4,10 +4,10 @@ import { useState, useEffect, createContext } from 'react';
 export const InventoryContext = createContext();
 
 const initialInventory = [
-    { id: 1, name: 'Carrot Seeds', quantity: 100, price: 10, category: 'Seeds', seedVariety: 'Nantes', sowingSeason: 'Spring' },
-    { id: 2, name: 'NPK Fertilizer', quantity: 50, price: 25, category: 'Fertilizers', composition: '10-10-10' },
-    { id: 3, name: 'Neem Oil', quantity: 75, price: 15, category: 'Pesticides', toxicityLevel: 'Low' },
-    { id: 4, name: 'Tomato Seeds', quantity: 120, price: 12, category: 'Seeds', seedVariety: 'Roma', sowingSeason: 'Spring' },
+    // { id: 1, name: 'Carrot Seeds', quantity: 100, price: 10, category: 'Seeds' },
+    // { id: 2, name: 'NPK Fertilizer', quantity: 50, price: 25, category: 'Fertilizers' },
+    // { id: 3, name: 'Neem Oil', quantity: 75, price: 15, category: 'Pesticides' },
+    // { id: 4, name: 'Tomato Seeds', quantity: 120, price: 12, category: 'Seeds' },
 ];
 
 export const InventoryProvider = ({ children }) => {
@@ -71,18 +71,6 @@ export const InventoryProvider = ({ children }) => {
         handleDeleteItem,
         handleAddCategory,
         updateInventoryQuantity,
-        categorySpecificFields: {
-            'Seeds': [
-                { name: 'seedVariety', label: 'Seed Variety', type: 'text' },
-                { name: 'sowingSeason', label: 'Sowing Season', type: 'text' },
-            ],
-            'Fertilizers': [
-                { name: 'composition', label: 'Composition', type: 'text' },
-            ],
-            'Pesticides': [
-                { name: 'toxicityLevel', label: 'Toxicity Level', type: 'text' },
-            ]
-        }
     };
 
     return (

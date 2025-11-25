@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
+import { color } from '@mui/system';
 
 export default function Nav() {
     return (
@@ -12,7 +13,7 @@ export default function Nav() {
             position="fixed"
             sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
         >
-            <Toolbar>
+            <Toolbar sx={{color:"white"}}>
                 <IconButton
                     size="large"
                     edge="start"
@@ -27,7 +28,8 @@ export default function Nav() {
                     component="div"
                     sx={{
                         flexGrow: 1,
-                        fontSize: { xs: 24, sm: 30, md: 40 } // Responsive font size
+                        fontSize: { xs: 24, sm: 30, md: 40 },
+                        color:"white" // Responsive font size
                     }}
                 >
                     AgriCore
