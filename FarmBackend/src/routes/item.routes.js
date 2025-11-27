@@ -17,6 +17,5 @@ router.route("/updateItem/:id").patch(verifyJWT, updateItem);
 
 router.route("/delete/:id").delete(verifyJWT, deleteItem);
 
-s
 
 export{router};

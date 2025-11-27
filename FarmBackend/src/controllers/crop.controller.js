@@ -24,10 +24,7 @@ const addCrop = asyncHandler(async(req, res)=>{
 
     //fetch stock for the items used
     for(const item of usedItems){
-        const fetchedStock = await Stock.findById({
-            item:item._id,
-            owner:req.user?._id
-        })
+        const fetchedStock = await Stock.findById( item._id)
 
         if (!fetchedStock) {
             throw new ApiError(404, "No stock for the given item! ", false);
@@ -63,7 +60,7 @@ const addCrop = asyncHandler(async(req, res)=>{
     }
 
     (await session).commitTransaction;
-    (await session).endSession();
+    await session.endSession();
 
     res.status(200)
     .json(new ApiResponse("Crop creating successfull! ",200, cropEntry))
