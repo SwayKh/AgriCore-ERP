@@ -9,7 +9,7 @@ const categorySchema = new mongoose.Schema({
     },
     unit:{
         type: String,
-        enum: ["kg", "g", "liters", "ml", "pieces", "bags", "units"],
+        enum: ["kg", "g", "liters", "ml", "pieces", "bags", "units", "tons"],
         required: true,
     },
     ownerId:{

@@ -4,6 +4,7 @@ import { Stock } from "../models/Stock.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import { Item } from "../models/Item.model.js";
 
 
 const addCrop = asyncHandler(async(req, res)=>{
@@ -27,8 +28,6 @@ const addCrop = asyncHandler(async(req, res)=>{
         throw new ApiError(400, "Items are required", false);
         
     }
-
-    console.log(usedItems);
     
     //fetch stock for the items used
     for(const item of usedItems){
@@ -83,5 +82,105 @@ const addCrop = asyncHandler(async(req, res)=>{
 
 })
 
+const getCrops = asyncHandler(async(req, res)=>{
+    const userId = req.user?._id;
 
-export{addCrop};
+    console.log(userId);
+    
+    const cropsData = await Crop.find({owner:userId});
+
+    if (!cropsData) {
+        throw new ApiError(500, "No crop of the user ",false)
+    }
+
+    return res.status(200).json(new ApiResponse("Crops data retreival successfull", 200, cropsData));
+})
+
+const updateCrop = asyncHandler(async(req, res)=>{
+    //get the actual yield
+    //update the crop status to harvested 
+    //update the stock with yield produced
+
+    const{actualYield, price, category} = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(req.params?.id)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid ObjectId",
+        });
+      }
+
+    const categoryId = new mongoose.Types.ObjectId(category);
+    const cropId = new mongoose.Types.ObjectId(req.params?.id);
+
+    console.log(categoryId);
+    console.log(cropId);
+    
+
+    if (!actualYield || !price || !category) {
+        throw new ApiError(400, "All fields are required ", false);
+    }
+
+    const userId = req.user?._id;
+
+    //creating session
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        //updating the crop data with actual yield and status
+        const cropData = await Crop.findByIdAndUpdate(cropId,
+        {$set:{status:"Harvested",
+            actualYield:actualYield
+        }},
+        {new:true},
+        {session}
+    )
+
+    //validating the cropData
+    if (!cropData) {
+        throw new ApiError(500, "Crop updation failed, try again! ", false);
+    }
+
+    //creating crop item
+    const cropItem = await Item.create({
+        itemName:cropData.cropName,
+        category:categoryId,
+        owner:userId,
+        price:price,
+        category:categoryId
+    })
+
+    if (!cropItem) {
+        throw new ApiError(500, "Crop updation failed, try again! ", false);
+    }
+
+    const cropStock = await Stock.create({
+        item: cropItem._id,
+        owner:userId,
+        quantity:actualYield,
+    })
+
+    if (!cropStock) {
+        throw new ApiError(500, "Crop updation failed, try again! ", false);
+    }
+
+    await session.commitTransaction()
+    
+    return res.status(200)
+    .json(new ApiResponse("Crop updation successFull ", 200, cropData));
+    } catch (error) {
+        if (session.inTransaction()) {
+            await session.abortTransaction()
+            throw new ApiError(500,error.message , false)
+        }
+    }
+    finally{
+        await session.endSession();
+    }
+
+})
+    
+    
+
+export{addCrop, getCrops, updateCrop};
