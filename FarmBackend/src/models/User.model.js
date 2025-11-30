@@ -20,8 +20,7 @@ const UserSchema = new mongoose.Schema({
     password:{
         type:String,
         required:true,
-        unique:true,
-        lowercase:true
+        select:false,
         //TODO: add validation on password length
     },
     email:{
@@ -48,7 +47,7 @@ const UserSchema = new mongoose.Schema({
 UserSchema.pre('save', async function(next){
     if (!this.isModified("password")) {
         //if the password is not modified then skips the encrypting functionality
-        next();
+        return next();
     }
 
     //brcypt is a library that is used for encrypting data

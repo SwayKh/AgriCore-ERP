@@ -88,6 +88,7 @@ const getCrops = asyncHandler(async(req, res)=>{
     console.log(userId);
     
     const cropsData = await Crop.find({owner:userId});
+    
 
     if (!cropsData) {
         throw new ApiError(500, "No crop of the user ",false)
