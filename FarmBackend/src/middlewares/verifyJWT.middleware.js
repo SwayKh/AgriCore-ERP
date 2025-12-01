@@ -17,14 +17,18 @@ const verifyJWT = asyncHandler(async(req,res, next)=>{
     }
     
     //cookie options configure
-    // const options = {
-    //     httpOnly:true,
-    //     secure:false
-    // }
+    const options = {
+        httpOnly:process.env.COOKIE_HTTP_ONLY,
+        secure:process.env.COOKIE_SECURE,
+        sameSite:process.env.COOKIE_SAMESITE,
+        domain:process.env.COOKIE_DOMAIN,
+        maxAge:process.env.COOKIE_MAX_AGE,
+        path:process.env.COOKIE_PATH,
+    }
 
     try {
         //verify the access token fetched from above
-        const decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, process.env.options);
+        const decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, options);
         
         //fetch the user details using the id in the decodedToken object
         const user = await User.findById(decodedToken._id)?.select("-password -refreshToken");
