@@ -7,18 +7,19 @@ const app = express();
 
 //app.use is used for middlewares and configuration
 app.use(
-    //cors setting configure
-    cors({
-    origin: "http://localhost:5173",
-    credentials:true,
-}))
+  //cors setting configure
+  cors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
+  })
+);
 
 //limit the json request to prevent from server crash
-app.use(express.json({limit:"20kb"}));
+app.use(express.json({ limit: "20kb" }));
 
 //allow the url parameter to be taken as input
 //parses incoming requests with urlencoded payloads
-app.use(express.urlencoded({extended:true, limit:"16kb"}));
+app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
 //allow some static resources like image with specified folder
 app.use(express.static("public"));
@@ -28,16 +29,14 @@ app.use(cookieParser());
 
 //routes
 //route import
-import {router as userRouter } from "./routes/user.routes.js";
-import {router as itemRouter} from "./routes/item.routes.js"
+import { router as userRouter } from "./routes/user.routes.js";
+import { router as itemRouter } from "./routes/item.routes.js";
 
 //user routes
 //all user related request will be routed from here only
-app.use("/api/v1/user", userRouter)
-
-
+app.use("/api/v1/user", userRouter);
 
 //other routes
-app.use("/api/v1/item", itemRouter)
+app.use("/api/v1/item", itemRouter);
 
 export default app;
