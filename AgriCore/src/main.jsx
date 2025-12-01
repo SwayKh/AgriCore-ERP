@@ -7,7 +7,8 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import {createBrowserRouter,RouterProvider} from 'react-router';
 import Layout from "./Layout.jsx";
-import Login2 from "./components/Login2.jsx"
+import SignUp from "./components/SignUp.jsx"
+import Login from "./components/Login.jsx"
 import CssBaseline from '@mui/material/CssBaseline'
 import {ThemeProvider} from "@mui/material/styles"
 import {createTheme} from "@mui/material/styles"
@@ -19,21 +20,19 @@ import InventoryTable from "./components/tables/Inventory/InventoryTable.jsx";
 import CropsTable from './components/tables/Crops/CropsTable.jsx';
 import LivestockTable from './components/tables/Livestock/LivestockTable.jsx';
 import FinanceTable from './components/tables/Finance/FinanceTable.jsx';
+import Dashboard from './components/Dashboard.jsx'; // Import the new Dashboard component
 
 import { InventoryProvider } from './context/InventoryContext.jsx';
 import { CropsProvider } from './context/CropsContext.jsx';
 
-// Placeholder for a Dashboard component
-const Dashboard = () => <div>Welcome to AgriCore Dashboard!</div>;
-
 const router=createBrowserRouter([
     {
         path:'/login', 
-        element:<Login2/>
+        element:<Login/>
     },
     {
         path:'/signup', 
-        element:<Login2/>
+        element:<SignUp/>
     },
     {
         path:'/',
@@ -84,10 +83,11 @@ createRoot(document.getElementById('root')).render(
      <ThemeProvider theme={theme}>
         <CssBaseline/>
         <InventoryProvider>
-          <CropsProvider>
+          <CropsProvider> {/* Ensure CropsProvider wraps RouterProvider */}
             <RouterProvider router={router}/>
           </CropsProvider>
         </InventoryProvider>
      </ThemeProvider>
   </StrictMode>,
 );
+

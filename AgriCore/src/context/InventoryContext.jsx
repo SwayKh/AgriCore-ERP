@@ -35,38 +35,44 @@ export const InventoryProvider = ({ children }) => {
         try {
             // Fetch inventory and categories in parallel.
             const [inventoryResponse, categoriesResponse] = await Promise.all([
-                fetch('/api/v1/inventory'),
-                fetch('/api/v1/categories') // Assumed endpoint
+                fetch('http://localhost:8000/api/v1/item/getItems', { credentials: 'include' }),
+                // fetch('/api/v1/categories') // Assumed endpoint
             ]);
+            console.log(inventoryResponse);
+            
 
             if (!inventoryResponse.ok) {
                 const errorData = await inventoryResponse.json();
+            
+                
                 throw new Error(errorData.message || 'Failed to fetch inventory');
             }
-            if (!categoriesResponse.ok) {
-                const errorData = await categoriesResponse.json();
-                throw new Error(errorData.message || 'Failed to fetch categories');
-            }
+            // if (!categoriesResponse.ok) {
+            //     const errorData = await categoriesResponse.json();
+            //     throw new Error(errorData.message || 'Failed to fetch categories');
+            // }
 
             const inventoryResult = await inventoryResponse.json();
-            const categoriesResult = await categoriesResponse.json();
+            //const categoriesResult = await categoriesResponse.json();
             
             // The server response for inventory is { success: true, data: [...] }
             if (inventoryResult.success && Array.isArray(inventoryResult.data)) {
                 setInventory(inventoryResult.data);
+                console.log(inventoryResult);
+                
             } else {
                 throw new Error('Unexpected response structure for inventory data');
             }
             
             // Assuming the server response for categories is { success: true, data: [...] }
-            if (categoriesResult.success && Array.isArray(categoriesResult.data)) {
-                setCategories(categoriesResult.data);
-            } else {
-                // If the categories endpoint fails or is structured differently, we can still proceed
-                // but the UI might not display category names or units correctly.
-                console.warn('Could not fetch or parse categories.');
-                setCategories([]); // Set to empty array to prevent crashes
-            }
+            // if (categoriesResult.success && Array.isArray(categoriesResult.data)) {
+            //     setCategories(categoriesResult.data);
+            // } else {
+            //     // If the categories endpoint fails or is structured differently, we can still proceed
+            //     // but the UI might not display category names or units correctly.
+            //     console.warn('Could not fetch or parse categories.');
+            //     setCategories([]); // Set to empty array to prevent crashes
+            // }
 
         } catch (err) {
             setError(err.message);
@@ -110,27 +116,28 @@ export const InventoryProvider = ({ children }) => {
      * After a successful save, it optimistically updates the local state for new items,
      * or re-fetches the entire inventory for updates (until specific update responses are known).
      */
-    const handleSaveItem = async (itemToSave, editingItem) => {
+    const handleSaveItem = async (itemData) => {
         setLoading(true);
         setError(null);
         try {
-            const endpoint = editingItem ? `/api/v1/inventory/${editingItem._id}` : '/api/v1/inventory';
-            const method = editingItem ? 'PATCH' : 'POST';
+            const isUpdating = itemData._id;
+            const endpoint = isUpdating ? `http://localhost:8000/api/v1/item/updateItem/${itemData._id}` : 'http://localhost:8000/api/v1/item/createItem';
+            const method = isUpdating ? 'PATCH' : 'POST';
 
             const response = await fetch(endpoint, {
                 method: method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(itemToSave),
+                body: JSON.stringify(itemData),
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || `Failed to ${editingItem ? 'update' : 'add'} item`);
+                throw new Error(errorData.message || `Failed to ${isUpdating ? 'update' : 'add'} item`);
             }
             
             const result = await response.json();
 
-            if (!editingItem) {
+            if (!isUpdating) {
                 // Optimistic update for new items
                 if (result.success && result.data && result.data.item && result.data.itemStock) {
                     const { item, itemStock } = result.data;
@@ -141,32 +148,26 @@ export const InventoryProvider = ({ children }) => {
                         stockId: itemStock._id // Ensure stockId is present
                     };
                     setInventory(prevInventory => [...prevInventory, newItemForState]);
-
-                    // Update categories if a new one was added or existing one used
-                    if (!categories.some(cat => cat._id === newItemForState.category)) {
-                        // In a real scenario, this would likely involve a separate API call to fetch
-                        // the new category details or the backend returning updated category list.
-                        // For now, we're assuming the category itself might already be known from
-                        // the initial fetchCategories, or we'd need to re-fetch categories too.
-                        // Since we don't have a clear new category API, we'll ensure our 'categories'
-                        // state is kept consistent by possibly adding a placeholder or re-fetching categories.
-                        // For simplicity, we'll re-run fetchData to refresh both if a new category is truly added.
-                        // This assumes the new item's category ID is an existing one for now.
-                        fetchData(); // Fallback to full fetch if category might be new/unresolved
-                    }
                 } else {
                     // Fallback to full fetch if response structure is unexpected
                     await fetchData();
                 }
             } else {
-                // For updates, until a specific response structure is known, re-fetch everything
-                await fetchData();
+                // For updates, assuming the backend returns the updated item,
+                // find and replace it in the local state.
+                if (result.success && result.data) {
+                    setInventory(prevInventory =>
+                        prevInventory.map(item => (item._id === result.data._id ? result.data : item))
+                    );
+                } else {
+                    // Fallback to full fetch if specific updated item is not returned
+                    await fetchData();
+                }
             }
 
         } catch (err) {
             setError(err.message);
             console.error("Failed to save item", err);
-            // In case of error after an optimistic update, revert or show error
             await fetchData(); // Ensure state is consistent after an error
         } finally {
             setLoading(false);
@@ -181,14 +182,14 @@ export const InventoryProvider = ({ children }) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`/api/v1/inventory/${itemId}`, { method: 'DELETE' });
+            const response = await fetch(`http://localhost:8000/api/v1/item/deleteItem/${itemId}`, { method: 'DELETE' });
 
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Failed to delete item');
             }
-            // After successful delete, re-fetch inventory.
-            await fetchInventory();
+            // After successful delete, filter the item from the local state
+            setInventory(prevInventory => prevInventory.filter(item => item._id !== itemId));
         } catch (err) {
             setError(err.message);
             console.error("Failed to delete item", err);

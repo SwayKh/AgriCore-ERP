@@ -132,7 +132,7 @@ export default function InventoryTable() {
             <ItemDialog
                 open={open}
                 onClose={handleClose}
-                onSave={(itemToSave) => handleSaveItem(itemToSave, editingItem)}
+                onSave={handleSaveItem}
                 item={editingItem}
             />
             <Table sx={{ minWidth: 650 }} aria-label="simple table">

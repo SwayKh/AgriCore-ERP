@@ -12,8 +12,9 @@ export default function ItemDialog({ open, onClose, onSave, item }) {
 
     useEffect(() => {
         if (item) {
-            // Ensure we are using the correct property 'itemName'
+            // Ensure we are using the correct property 'itemName' and include _id for updates
             setNewItem({
+                _id: item._id || '', // Include _id if it exists
                 itemName: item.itemName || '',
                 quantity: item.quantity || '',
                 price: item.price || '',

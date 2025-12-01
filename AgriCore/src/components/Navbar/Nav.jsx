@@ -34,7 +34,6 @@ export default function Nav() {
                 >
                     AgriCore
                 </Typography>
-                <Button color="inherit">Login</Button>
             </Toolbar>
         </AppBar>
     );

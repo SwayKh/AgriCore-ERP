@@ -7,11 +7,14 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import GrassIcon from '@mui/icons-material/Grass';
 import AgricultureIcon from '@mui/icons-material/Agriculture';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import InventoryIcon from '@mui/icons-material/Inventory';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { Typography } from '@mui/material';
 
 const drawerWidth = 240;
 
@@ -22,7 +25,22 @@ const menuItems = [
     { text: 'INVENTORY', path: '/app/inventory', icon: <InventoryIcon /> }
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ username }) {
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        try {
+            await fetch('http://localhost:8000/api/v1/user/logout', {
+                method: 'POST',
+                credentials: 'include',
+            });
+        } catch (error) {
+            console.error('Logout failed:', error);
+        } finally {
+            navigate('/login');
+        }
+    };
+
     return (
         <Drawer
             sx={{
@@ -40,8 +58,8 @@ export default function Sidebar() {
             <Divider />
             <List>
                 {menuItems.map((item) => (
-                    <Link to={item.path} style={{ textDecoration: 'none', color: 'inherit' }}>
-                        <ListItem key={item.text} disablePadding>
+                    <Link to={item.path} style={{ textDecoration: 'none', color: 'inherit' }} key={item.text}>
+                        <ListItem disablePadding>
                             <ListItemButton>
                                 <ListItemIcon>
                                     {item.icon}
@@ -52,6 +70,25 @@ export default function Sidebar() {
                     </Link>
                 ))}
             </List>
+            <div style={{ position: 'absolute', bottom: 0, width: '100%' }}>
+                <Divider />
+                <List>
+                    <ListItem>
+                        <ListItemIcon>
+                            <AccountCircleIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={username || 'User'} />
+                    </ListItem>
+                    <ListItem disablePadding>
+                        <ListItemButton onClick={handleLogout}>
+                            <ListItemIcon>
+                                <LogoutIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Logout" />
+                        </ListItemButton>
+                    </ListItem>
+                </List>
+            </div>
         </Drawer>
     );
 }

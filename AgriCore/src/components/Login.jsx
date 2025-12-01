@@ -1,41 +1,112 @@
-import React from 'react'
-import {Box, Button, Container, Stack, TextField, Typography,FormLabel} from "@mui/material";
-import {useState} from "react";
-import {green} from "@mui/material/colors";
-
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Button,
+  Container,
+  Stack,
+  TextField,
+  Typography,
+  FormLabel,
+} from '@mui/material';
+import { useState } from 'react';
 
 function Login() {
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState(null)
+  const navigate = useNavigate();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-    // function hitLogin(){
-    //     fetch("",[POST])
-    //         .then(response=>response.json())
-    //         .then(data=>console.log(data))
-    // }
-    const handleSubmit=(e)=>{
-        e.preventDefault()
-        // hitLogin();
-        console.log(username,password);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      const response = await fetch('http://localhost:8000/api/v1/user/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Login successful:', data);
+        // Assuming the API returns a user object with a username field
+        navigate('/app', { state: { username: data.data.username } });
+      } else {
+        const errorData = await response.json().catch(() => ({ message: 'An error occurred' }));
+        throw new Error(errorData.message || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error.message);
+      setError(error.message);
     }
-    return (
-        <div>
-            <Container maxWidth='sm' sx={{display:'flex',justifyContent:'space-between' ,border:1, borderRadius:3.5, mb:5,bgcolor:"#4caf50"}}>
-                <Stack spacing={3} sx={{mb:3}}>
-                    <Typography variant="h3"> Login </Typography>
-                    <Box component="form" sx={{display:"flex",flexDirection:'column',gap:5,border:1,borderRadius:3.5,p:2}} >
-                        <FormLabel sx={{pl:0, mb:0}}>username</FormLabel>
-                        <TextField name="username" variant="filled" label="username" type="text" value={username} onChange={(e)=>{setUsername(e.target.value)}}>username</TextField>
-                        <TextField variant="filled" label='password' type="password" value={password} onChange={(e)=>{setPassword(e.target.value)}}>password</TextField>
-                        <Button sx={{border:1}} type="submit" onClick={handleSubmit}>Submit</Button>
+  };
 
-
-                    </Box>
-
-
-                </Stack>
-            </Container></div>
-    )
+  return (
+    <div>
+      <Container
+        maxWidth="sm"
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+        }}
+      >
+        <Stack spacing={3} sx={{ mb: 3, width: '100%', maxWidth: '400px' }}>
+          <Typography variant="h3" textAlign="center">
+            {' '}
+            Login{' '}
+          </Typography>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
+              p: 3,
+              border: 1,
+              borderRadius: 3.5,
+              borderColor: 'grey.300',
+              boxShadow: 3,
+            }}
+          >
+            <FormLabel>Username</FormLabel>
+            <TextField
+              name="username"
+              variant="outlined"
+              label="username"
+              type="text"
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+              }}
+            />
+            <FormLabel>Password</FormLabel>
+            <TextField
+              name="password"
+              variant="outlined"
+              label="password"
+              type="password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
+            />
+            {error && <Typography color="error">{error}</Typography>}
+            <Button sx={{ border: 1 }} type="submit">
+              Submit
+            </Button>
+          </Box>
+        </Stack>
+      </Container>
+    </div>
+  );
 }
 
-export default Login
+export default Login;
