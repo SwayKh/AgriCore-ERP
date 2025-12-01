@@ -20,9 +20,11 @@ export const CropsProvider = ({ children }) => {
     setError(null);
     try {
       const response = await fetch(
-        import.meta.env.VITE_BACKEND_URL + "/api/v1/crop/getCrops",
+        "http://localhost:8000/api/v1/item/getCrops",
         { credentials: "include" },
       );
+
+      console.log(response)
 
       if (!response.ok) {
         const contentType = response.headers.get("content-type");
