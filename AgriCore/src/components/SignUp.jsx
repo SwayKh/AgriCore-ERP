@@ -123,7 +123,7 @@ export default function SignUp(props) {
     if (isValid) {
       const data = { fullName, username, email, password };
 
-      fetch(process.env.BACKEND_URL + "/api/v1/user/register", {
+      fetch(import.meta.env.VITE_BACKEND_URL + "/api/v1/user/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -275,4 +275,3 @@ export default function SignUp(props) {
     // </AppTheme>
   );
 }
-

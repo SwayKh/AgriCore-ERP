@@ -20,7 +20,7 @@ export const CropsProvider = ({ children }) => {
     setError(null);
     try {
       const response = await fetch(
-        process.env.BACKEND_URL + "/api/v1/crop/getCrops",
+        import.meta.env.VITE_BACKEND_URL + "/api/v1/crop/getCrops",
         { credentials: "include" },
       );
 

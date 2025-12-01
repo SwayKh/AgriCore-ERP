@@ -34,7 +34,7 @@ export default function Sidebar({
 
   const handleLogout = async () => {
     try {
-      await fetch(process.env.BACKEND_URL + "/api/v1/user/logout", {
+      await fetch(import.meta.env.VITE_BACKEND_URL + "/api/v1/user/logout", {
         method: "POST",
         credentials: "include",
       });
@@ -103,4 +103,3 @@ export default function Sidebar({
     </Drawer>
   );
 }
-
