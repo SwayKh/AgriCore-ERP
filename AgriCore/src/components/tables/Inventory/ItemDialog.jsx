@@ -9,7 +9,7 @@ import { InventoryContext } from '../../../context/InventoryContext';
 export default function ItemDialog({ open, onClose, onSave, item, itemError }) {
     const { categories } = useContext(InventoryContext);
     const [newItem, setNewItem] = useState({ itemName: '', quantity: '', price: '', categoryName: '' });
-    const [localError, setLocalError] = useState(null);
+    const [localErrors, setLocalErrors] = useState({});
 
     useEffect(() => {
         if (open) {
@@ -26,61 +26,76 @@ export default function ItemDialog({ open, onClose, onSave, item, itemError }) {
             } else {
                 setNewItem({ itemName: '', quantity: '', price: '', categoryName: '' });
             }
-            setLocalError(null); // Clear local error when dialog opens
+            setLocalErrors({}); // Clear local errors when dialog opens
         }
     }, [item, open, categories]); // Add categories to dependency array
 
     const handleNewItemChange = (e) => {
         setNewItem({ ...newItem, [e.target.name]: e.target.value });
+        setLocalErrors(prevErrors => ({ ...prevErrors, [e.target.name]: undefined })); // Clear error for the field being edited
     };
 
     const handleSave = async () => {
-        setLocalError(null); // Clear previous errors before attempting save
+        let errors = {};
 
-        // Basic client-side validation
-        if (!newItem.itemName || !newItem.quantity || !newItem.price || !newItem.categoryName) {
-            setLocalError("All fields are required!");
-            return;
+        if (!newItem.itemName) {
+            errors.itemName = "Item Name is required.";
         }
-        if (newItem.quantity <= 0) {
-            setLocalError("Quantity must be a positive number.");
-            return;
+        if (!newItem.quantity) {
+            errors.quantity = "Quantity is required.";
         }
-        if (newItem.price <= 0) {
-            setLocalError("Price must be a positive number.");
-            return;
+        else if (parseInt(newItem.quantity, 10) <= 0) {
+            errors.quantity = "Quantity must be a positive number.";
         }
+        if (!newItem.price) {
+            errors.price = "Price is required.";
+        }
+        else if (parseFloat(newItem.price) <= 0) {
+            errors.price = "Price must be a positive number.";
+        }
+        if (!newItem.categoryName) {
+            errors.categoryName = "Category is required.";
+        }
+        else {
+            const selectedCategory = categories.find(cat => cat.categoryName === newItem.categoryName);
+            if (!selectedCategory) {
+                errors.categoryName = "Selected category is invalid.";
+            }
+        }
+
+        if (Object.keys(errors).length > 0) {
+            setLocalErrors(errors);
+            return false; // Indicate validation failure
+        }
+
+        setLocalErrors({}); // Clear all errors if validation passes
 
         // Find the category ID based on the selected categoryName
         const selectedCategory = categories.find(cat => cat.categoryName === newItem.categoryName);
-        if (!selectedCategory) {
-            setLocalError("Selected category is invalid.");
-            return;
-        }
+        // selectedCategory check is already done in validation, so no need to re-check here.
 
-        const itemDataToSend = {
-            _id: newItem._id, // Include _id if updating
+        let itemDataToSend = {
             itemName: newItem.itemName,
             quantity: parseInt(newItem.quantity, 10), // Ensure quantity is a number
             price: parseFloat(newItem.price), // Ensure price is a number
-            category: selectedCategory._id, // Use the category ID
-            // categoryName is not sent to the backend as it expects the ID
+            categoryName: newItem.categoryName, // Use categoryName instead of category ID
         };
 
+        if (newItem._id) { // Only include _id if it exists (i.e., we are editing an existing item)
+            itemDataToSend._id = newItem._id;
+        }
         const success = await onSave(itemDataToSend);
         if (success) {
             onClose(); // Close the dialog only if saving was successful
-        } else {
-            // Error message will be set by the context and passed down via itemError
-            // or if there is a local validation error
         }
+        return success; // Return true/false based on onSave outcome
     };
 
     return (
         <Dialog open={open} onClose={onClose}>
             <DialogTitle>{item ? 'Edit Item' : 'Add New Item'}</DialogTitle>
             <DialogContent>
-                {localError && <Alert severity="error" sx={{ mb: 2 }}>{localError}</Alert>}
+
                 {itemError && <Alert severity="error" sx={{ mb: 2 }}>{itemError}</Alert>}
                 <TextField
                     autoFocus
@@ -92,8 +107,8 @@ export default function ItemDialog({ open, onClose, onSave, item, itemError }) {
                     variant="standard"
                     value={newItem.itemName}
                     onChange={handleNewItemChange}
-                    error={!!localError && !newItem.itemName}
-                    helperText={!!localError && !newItem.itemName ? "Item Name is required" : ""}
+                    error={!!localErrors.itemName}
+                    helperText={localErrors.itemName}
                 />
                 <TextField
                     margin="dense"
@@ -104,8 +119,8 @@ export default function ItemDialog({ open, onClose, onSave, item, itemError }) {
                     variant="standard"
                     value={newItem.quantity}
                     onChange={handleNewItemChange}
-                    error={!!localError && (newItem.quantity <= 0 || !newItem.quantity)}
-                    helperText={!!localError && (newItem.quantity <= 0 || !newItem.quantity) ? "Quantity must be a positive number" : ""}
+                    error={!!localErrors.quantity}
+                    helperText={localErrors.quantity}
                 />
                 <TextField
                     margin="dense"
@@ -116,10 +131,10 @@ export default function ItemDialog({ open, onClose, onSave, item, itemError }) {
                     variant="standard"
                     value={newItem.price}
                     onChange={handleNewItemChange}
-                    error={!!localError && (newItem.price <= 0 || !newItem.price)}
-                    helperText={!!localError && (newItem.price <= 0 || !newItem.price) ? "Price must be a positive number" : ""}
+                    error={!!localErrors.price}
+                    helperText={localErrors.price}
                 />
-                <FormControl fullWidth margin="dense" error={!!localError && !newItem.categoryName}>
+                <FormControl fullWidth margin="dense" error={!!localErrors.categoryName}>
                     <InputLabel>Category</InputLabel>
                     <Select
                         name="categoryName" // <-- Name is correct for backend
@@ -130,7 +145,7 @@ export default function ItemDialog({ open, onClose, onSave, item, itemError }) {
                             <MenuItem key={cat._id} value={cat.categoryName}>{cat.categoryName}</MenuItem> //* <-- MenuItem value is categoryName string */}
                         ))}
                     </Select>
-                    {!!localError && !newItem.categoryName && <FormHelperText>Category is required</FormHelperText>}
+                    {!!localErrors.categoryName && <FormHelperText>{localErrors.categoryName}</FormHelperText>}
                 </FormControl>
             </DialogContent>
             <DialogActions>
@@ -140,3 +155,5 @@ export default function ItemDialog({ open, onClose, onSave, item, itemError }) {
         </Dialog>
     );
 }
+
+

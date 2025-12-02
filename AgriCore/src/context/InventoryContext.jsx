@@ -64,7 +64,6 @@ export const InventoryProvider = ({ children }) => {
       if (categoriesResult.success && Array.isArray(categoriesResult.data)) {
         setCategories(categoriesResult.data);
       } else {
-        console.warn("Could not fetch or parse categories.");
         setCategories([]); // Set to empty array to prevent crashes
       }
     } catch (err) {
@@ -279,3 +278,4 @@ export const InventoryProvider = ({ children }) => {
     </InventoryContext.Provider>
   );
 };
+
