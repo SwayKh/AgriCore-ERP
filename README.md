@@ -1,6 +1,6 @@
-# AgriCore-ERP-Full
+# AgriCore-ERP
 
-AgriCore-ERP-Full is a comprehensive, full-stack web application designed to streamline farm management operations. It provides an intuitive interface for managing crops, inventory, and other farm-related activities.
+AgriCore-ERP is a comprehensive, full-stack web application designed to streamline farm management operations. It provides an intuitive interface for managing crops, inventory, and other farm-related activities.
 
 ## Features
 
@@ -43,8 +43,8 @@ These instructions will get you a copy of the project up and running on your loc
 1.  **Clone the repository:**
 
     ```bash
-    git clone https://github.com/your-username/AgriCore-ERP-Full.git
-    cd AgriCore-ERP-Full
+    git clone https://github.com/your-username/AgriCore-ERP.git
+    cd AgriCore-ERP
     ```
 
 2.  **Install frontend dependencies:**
@@ -107,7 +107,7 @@ The project is organized into two main directories:
 A brief overview of the directory structure:
 
 ```
-AgriCore-ERP-Full/
+AgriCore-ERP/
 ├── AgriCore/         # Frontend React application
 │   ├── src/
 │   │   ├── components/
