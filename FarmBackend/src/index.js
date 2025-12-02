@@ -4,25 +4,19 @@ import app from "./app.js";
 import dbConnect from "./db/dbConnect.js";
 
 dotenv.config({
-    path: './.env',  //dont write ./env it should be ./.env
-})
-
+  path: "./.env", //dont write ./env it should be ./.env
+});
 
 const port = process.env.PORT;
 
-
 dbConnect()
-.then(
+  .then(
     console.log("DB is connected, now app will run "),
     app.listen(port || 8000, ()=>{
         console.log("Server is running on port no " , port)
         console.log("Domain ", process.env.COOKIE_DOMAIN, typeof(process.env.COOKIE_DOMAIN))
     })
-)
-.catch("error", (error)=>{
+  )
+  .catch("error", (error) => {
     console.log("An error occured ", error);
-    
-})
-
-
-
+  });
