@@ -4,7 +4,7 @@ import {
     Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle,
     Select, MenuItem, FormControl, InputLabel, Alert, FormHelperText
 } from '@mui/material';
-import { InventoryContext, handleSaveItem } from '../../../context/InventoryContext';
+import { InventoryContext } from '../../../context/InventoryContext';
 
 export default function ItemDialog({ open, onClose, onSave, item, itemError }) {
     const { categories } = useContext(InventoryContext);
@@ -43,17 +43,20 @@ export default function ItemDialog({ open, onClose, onSave, item, itemError }) {
         }
         if (!newItem.quantity) {
             errors.quantity = "Quantity is required.";
-        } else if (parseInt(newItem.quantity, 10) <= 0) {
+        }
+        else if (parseInt(newItem.quantity, 10) <= 0) {
             errors.quantity = "Quantity must be a positive number.";
         }
         if (!newItem.price) {
             errors.price = "Price is required.";
-        } else if (parseFloat(newItem.price) <= 0) {
+        }
+        else if (parseFloat(newItem.price) <= 0) {
             errors.price = "Price must be a positive number.";
         }
         if (!newItem.categoryName) {
             errors.categoryName = "Category is required.";
-        } else {
+        }
+        else {
             const selectedCategory = categories.find(cat => cat.categoryName === newItem.categoryName);
             if (!selectedCategory) {
                 errors.categoryName = "Selected category is invalid.";
@@ -71,19 +74,20 @@ export default function ItemDialog({ open, onClose, onSave, item, itemError }) {
         const selectedCategory = categories.find(cat => cat.categoryName === newItem.categoryName);
         // selectedCategory check is already done in validation, so no need to re-check here.
 
-        const itemDataToSend = {
-            _id: newItem._id, // Include _id if updating
+        let itemDataToSend = {
             itemName: newItem.itemName,
             quantity: parseInt(newItem.quantity, 10), // Ensure quantity is a number
             price: parseFloat(newItem.price), // Ensure price is a number
-            category: selectedCategory._id, // Use the category ID
-            // categoryName is not sent to the backend as it expects the ID
+            categoryName: newItem.categoryName, // Use categoryName instead of category ID
         };
 
+        if (newItem._id) { // Only include _id if it exists (i.e., we are editing an existing item)
+            itemDataToSend._id = newItem._id;
+        }
         const success = await onSave(itemDataToSend);
         if (success) {
             onClose(); // Close the dialog only if saving was successful
-        } // The itemError prop will handle backend errors if `success` is false.
+        }
         return success; // Return true/false based on onSave outcome
     };
 
@@ -151,4 +155,5 @@ export default function ItemDialog({ open, onClose, onSave, item, itemError }) {
         </Dialog>
     );
 }
+
 
