@@ -16,7 +16,7 @@ dbConnect()
     console.log("DB is connected, now app will run "),
     app.listen(port || 8000, ()=>{
         console.log("Server is running on port no " , port)
-        
+        console.log("Domain ", process.env.COOKIE_DOMAIN, typeof(process.env.COOKIE_DOMAIN))
     })
 )
 .catch("error", (error)=>{

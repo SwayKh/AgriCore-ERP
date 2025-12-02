@@ -139,24 +139,30 @@ const updateCrop = asyncHandler(async(req, res)=>{
         throw new ApiError(500, "Crop updation failed, try again! ", false);
     }
 
+    console.log(cropData);
+    
+
     //creating crop item
-    const cropItem = await Item.create({
+    const cropItem = await Item.create([{
         itemName:cropData.cropName,
         category:categoryId,
         owner:userId,
         price:price,
-        category:categoryId,
-    },{session})
+    }
+    ],{session})
+
+    console.log(cropItem);
+    
 
     if (!cropItem) {
         throw new ApiError(500, "Crop updation failed, try again! ", false);
     }
 
-    const cropStock = await Stock.create({
-        item: cropItem._id,
+    const cropStock = await Stock.create([{
+        item: cropItem[0]._id,
         owner:userId,
         quantity:actualYield,
-    },{session})
+    }],{session})
 
     if (!cropStock) {
         throw new ApiError(500, "Crop updation failed, try again! ", false);

@@ -28,6 +28,18 @@ const generateAccessNrefreshToken = async (userId) => {
   }
 };
 
+
+const checkUser = asyncHandler(async(req,res)=>{
+    const user = req?.user;
+
+    if (!user) {
+      throw new ApiError(400, "User is not authenticated! ", false)
+    }
+
+    return res.status(200)
+    .json(new ApiResponse("User is authenticated! ", 200))
+})
+
 //this function register the first time user
 //fetch the user form data from the req body and creates a new user in the database
 const registerUser = asyncHandler(async (req, res) => {
@@ -93,7 +105,9 @@ const registerUser = asyncHandler(async (req, res) => {
 //provides the login feature
 //checks for the user in the database and compare the password for authentication
 const loginUser = asyncHandler(async (req, res) => {
-  console.log("Cookie domain: ", process.env.COOKIE_DOMAIN);
+  console.log("Hello");
+  
+  console.log("Cookie domain: ", process.env.COOKIE_DOMAIN, typeof(process.env.COOKIE_DOMAIN));
   console.log("Current User: ", req.user)
   //fetch the user details
   //deconstruction the req.body fields
@@ -141,11 +155,11 @@ const loginUser = asyncHandler(async (req, res) => {
   //options configured for the cookies
   const options = {
         httpOnly: process.env.COOKIE_HTTP_ONLY === "true",
-        secure: process.env.COOKIE_SECURE === "true",
-        sameSite: process.env.COOKIE_SAMESITE, // "None" | "Lax" | "Strict"
-        domain: process.env.COOKIE_DOMAIN || undefined, // frontend domain
-        maxAge: Number(process.env.COOKIE_MAX_AGE), // convert string to number
-        path: process.env.COOKIE_PATH || "/",
+        secure: process.env.COOKIE_SECURE === "false",
+        // sameSite: process.env.COOKIE_SAMESITE, // "None" | "Lax" | "Strict"
+        // domain: process.env.COOKIE_DOMAIN || undefined, // frontend domain
+        // maxAge: Number(process.env.COOKIE_MAX_AGE), // convert string to number
+        // path: process.env.COOKIE_PATH || "/",
     };
 
   return (
@@ -272,4 +286,5 @@ export {
   logOutUser,
   updateUserPassword,
   reGenerateTokens,
+  checkUser
 };
